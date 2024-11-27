@@ -1,0 +1,67 @@
+package org.example;
+
+import java.sql.*;
+import java.util.Scanner;
+
+public class UserData {
+
+    // JDBC URL, username, and password for MySQL
+    static final String JDBC_URL = "jdbc:mysql://http://localhost:5175//usersdb?useSSL=false&serverTimezone=UTC";
+    static final String JDBC_USERNAME = "root";
+    static final String JDBC_PASSWORD = "Kathir@9360@";
+
+    public static void main(String[] args) {
+        // Create a Scanner object for user input
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Enter user details");
+
+        System.out.print("Name: ");
+        String name = scanner.nextLine();
+
+        System.out.print("Email: ");
+        String email = scanner.nextLine();
+
+        System.out.print("Date of Birth (YYYY-MM-DD): ");
+        String dob = scanner.nextLine();
+
+        System.out.print("Mobile: ");
+        String mobile = scanner.nextLine();
+
+        // Call the insertUser method to insert the data into the database
+        insertUser(name, email, dob, mobile);
+
+        scanner.close();
+    }
+
+    // Method to insert user data into the MySQL database
+    public static void insertUser(String name, String email, String dob, String mobile) {
+        // Create a connection to the database
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD)) {
+
+            // SQL query to insert data
+            String sql = "INSERT INTO users (name, email, dob, mobile) VALUES (?, ?, ?, ?)";
+
+            // Prepare the statement
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                // Set values for the placeholders
+                preparedStatement.setString(1, name);
+                preparedStatement.setString(2, email);
+                preparedStatement.setString(3, dob);
+                preparedStatement.setString(4, mobile);
+
+                // Execute the statement
+                int rowsAffected = preparedStatement.executeUpdate();
+
+                // Check if the insert was successful
+                if (rowsAffected > 0) {
+                    System.out.println("User added successfully!");
+                } else {
+                    System.out.println("Error adding user.");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+}
